@@ -9,38 +9,38 @@ var gravatar = require('gravatar');
 // Export a function, so that we can pass 
 // the app and io instances from the app.js file:
 
-module.exports = function(app,io){
+module.exports = function(app,io) {
 
-	app.get('/', function(req, res){
+	app.get('/', function(req, res) {
 
 		// Render views/home.html
 		res.render('home');
 	});
 
-	app.get('/create', function(req,res){
+	app.get('/create', function(req,res) {
 
 		// Generate unique id for the room
 		var id = Math.round((Math.random() * 1000000));
 
 		// Redirect to the random room
-		res.redirect('/chat/'+id);
+		res.redirect('/chat/' + id);
 	});
 
-	app.get('/chat/:id', function(req,res){
+	app.get('/chat/:id', function(req, res){
 
-		// Render the chant.html view
+		// Render the chat.html view
 		res.render('chat');
 	});
 
 	// Initialize a new socket.io application, named 'chat'
-	var chat = io.on('connection', function (socket) {
+	var chat = io.on('connection', function(socket) {
 
 		// When the client emits the 'load' event, reply with the 
 		// number of people in this chat room
 
-		socket.on('load',function(data){
+		socket.on('load',function(data) {
 
-			var room = findClientsSocket(io,data);
+			var room = findClientsSocket(io, data);
 			if(room.length === 0 ) {
 
 				socket.emit('peopleinchat', {number: 0});
@@ -95,7 +95,6 @@ module.exports = function(app,io){
 
 					// Send the startChat event to all the people in the
 					// room, along with a list of people that are in it.
-
 					chat.in(data.id).emit('startChat', {
 						boolean: true,
 						id: data.id,
@@ -114,7 +113,6 @@ module.exports = function(app,io){
 
 			// Notify the other person in the chat room
 			// that his partner has left
-
 			socket.broadcast.to(this.room).emit('leave', {
 				boolean: true,
 				room: this.room,
@@ -128,7 +126,7 @@ module.exports = function(app,io){
 
 
 		// Handle the sending of messages
-		socket.on('msg', function(data){
+		socket.on('msg', function(data) {
 
 			// When the server receives a message, it sends it to the other person in the room.
 			socket.broadcast.to(socket.room).emit('receive', {msg: data.msg, user: data.user, img: data.img});
@@ -136,7 +134,7 @@ module.exports = function(app,io){
 	});
 };
 
-function findClientsSocket(io,roomId, namespace) {
+function findClientsSocket(io, roomId, namespace) {
 	var res = [],
 		ns = io.of(namespace ||"/");    // the default namespace is "/"
 

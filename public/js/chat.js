@@ -1,5 +1,4 @@
 // This file is executed in the browser, when people visit /chat/<random id>
-
 $(function() {
 
 	// getting the id of the room from the url
@@ -12,7 +11,8 @@ $(function() {
 	var name = "",
 		email = "",
 		img = "",
-		friend = "";
+		friend = "",
+		lang = "";
 
 	// cache some jQuery objects
 	var section = $(".section"),
@@ -79,7 +79,7 @@ $(function() {
 			});
 		}
 		else if(data.number === 1) {
-			showMessage("personinchat",data);
+			showMessage("personinchat", data);
 
 			loginForm.on('submit', function(e) {
 				e.preventDefault();
@@ -128,7 +128,7 @@ $(function() {
 	});
 
 	socket.on('leave',function(data) {
-		if(data.boolean && id==data.room) {
+		if(data.boolean && id == data.room) {
 			showMessage("somebodyLeft", data);
 			chats.empty();
 		}
@@ -144,6 +144,7 @@ $(function() {
 		showMessage('chatStarted');
 
 		if(data.msg.trim().length) {
+			//handle translation
 			createChatMessage(data.msg, data.user, data.img, moment());
 			scrollToBottom();
 		}
@@ -167,6 +168,7 @@ $(function() {
 			scrollToBottom();
 
 			// Send the message to the other person in the chat
+			//emit translated message
 			socket.emit('msg', {msg: textarea.val(), user: name, img: img});
 		}
 		// Empty the textarea
